@@ -18,16 +18,27 @@ ctx.msImageSmoothingEnabled = false;
 window.addEventListener("load", startMenu);
 window.addEventListener("resize", resizeCanvas);
 canvas.addEventListener("click", handleClick);
+canvas.addEventListener("mousemove", handleMouseMove);
 
 // SOUNDS AND MUSIC
 var gameAudio = new Audio("assets/music/gamemusic.mp3");
+gameAudio.loop = true;
+gameAudio.volume = 0.25; 
+
 var clickSound = new Audio("assets/music/button.mp3");
+clickSound.volume = 0.5; 
+
+// MOUSE COORDINATES
+function updateMouseCoordinates(event) {
+  var rect = canvas.getBoundingClientRect(); 
+  var x = (event.clientX - rect.left) * (gameWidth / rect.width);
+  var y = (event.clientY - rect.top) * (gameHeight / rect.height);
+  return { x: x, y: y };
+}
 
 // CLICK HANDLER
 function handleClick(event) {
-  var rect = canvas.getBoundingClientRect();
-  var x = (event.clientX - rect.left) * (gameWidth / rect.width);
-  var y = (event.clientY - rect.top) * (gameHeight / rect.height);
+  var { x, y } = updateMouseCoordinates(event);
   
   if (currentState === "startMenu" && isPointInButton(x, y, playButton)) {
     currentState = "playing";
@@ -37,17 +48,24 @@ function handleClick(event) {
 
   if (currentState === "playing") {
     if (isPointInButton(x, y, clicker)) {
-      cashAmount++;
-      clickSound.play();
-      clickSound.volume = 0.5; 
-      console.log("Cash Amount: " + cashAmount);
+      cashAmount++; 
       updateCashText(); 
     }
-    
-    if (isPointInButton(x, y, cashTally)) {
-      alert("Cash Amount: " + cashAmount);
-    }
   }
+}
+
+// MOUSE MOVE HANDLER
+function handleMouseMove(event) {
+  var { x, y } = updateMouseCoordinates(event);
+  var isOverClickable = false;
+  
+  if (currentState === "startMenu" && isPointInButton(x, y, playButton)) {
+    isOverClickable = true;
+  } else if (currentState === "playing" && isPointInButton(x, y, clicker)) {
+    isOverClickable = true;
+  }
+  
+  canvas.style.cursor = isOverClickable ? "pointer" : "default";
 }
 
 function isPointInButton(x, y, button) {
@@ -113,8 +131,6 @@ function startGame() {
   };
   backgroundImage.src = "assets/images/game.png";
   setTimeout(function() {
-    gameAudio.loop = true;
-    gameAudio.volume = 0.75; 
     gameAudio.play();
   }, 200);
 }
