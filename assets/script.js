@@ -6,6 +6,9 @@ var gameHeight = canvas.height;
 
 // GAME STATE
 var cashAmount = 0; 
+var cashPerSecond = 0; 
+var cashPerClick = 1; 
+
 var currentState = "startMenu";
 
 // RENDERING SETTINGS
@@ -48,8 +51,22 @@ function handleClick(event) {
 
   if (currentState === "playing") {
     if (isPointInButton(x, y, clicker)) {
-      cashAmount++; 
+      cashAmount += cashPerClick; 
       updateCashText(); 
+    }
+    if (isPointInButton(x, y, onePerSecond)) {
+      if (cashAmount >= 10) {
+        cashAmount -= 10;
+        cashPerSecond += 1; 
+        updateCashText();
+      }
+    }
+    if (isPointInButton(x, y, plusTwoOnClick)) {
+      if (cashAmount >= 25) {
+        cashAmount -= 25;
+        cashPerClick += 1; 
+        updateCashText();
+      }
     }
   }
 }
@@ -61,10 +78,17 @@ function handleMouseMove(event) {
   
   if (currentState === "startMenu" && isPointInButton(x, y, playButton)) {
     isOverClickable = true;
-  } else if (currentState === "playing" && isPointInButton(x, y, clicker)) {
+  } 
+  if (currentState === "playing" && isPointInButton(x, y, clicker)) {
     isOverClickable = true;
   }
-  
+  if (currentState === "playing" && isPointInButton(x, y, onePerSecond)) {
+    isOverClickable = true;
+  } 
+  if (currentState === "playing" && isPointInButton(x, y, plusTwoOnClick)) {
+    isOverClickable = true;
+  }
+
   canvas.style.cursor = isOverClickable ? "pointer" : "default";
 }
 
@@ -125,6 +149,8 @@ function startGame() {
   backgroundImage.onload = function() {
     ctx.clearRect(0, 0, gameWidth, gameHeight);
     ctx.drawImage(backgroundImage, 0, 0, gameWidth, gameHeight);
+    drawImage(onePerSecond);
+    drawImage(plusTwoOnClick);
     drawImage(cashTally);
     drawImage(clicker);
     updateCashText();
@@ -133,8 +159,29 @@ function startGame() {
   setTimeout(function() {
     gameAudio.play();
   }, 200);
+
+  cashPerSecondMultiplier();
+  clickMultiplier();
 }
 
+// CASH PER SECOND FUNCTION 
+function cashPerSecondMultiplier() {
+  setInterval(function() {
+    if (currentState === "playing" && cashPerSecond > 0) {
+      cashAmount += cashPerSecond;
+      updateCashText();
+    }
+  }, 1000); 
+}
+// CLICK MULTIPLIER FUNCTION
+function cashPerClickAdder() {
+  if (currentState === "playing") {
+    cashAmount += cashPerClick; 
+    updateCashText(); 
+  }
+}
+
+// UPDATE CASH TEXT FUNCTION
 function updateCashText() {
   var textX = cashTally.x + cashTally.width - 325; 
   var textY = cashTally.y + 65; 
@@ -145,6 +192,7 @@ function updateCashText() {
   ctx.fillText(cashAmount, textX, textY);
 }
 
+// IMAGE OBJECTS
 const clicker = {
   x: (gameWidth - 96) / 4.8,
   y: (gameHeight - 244) / 2,
@@ -162,3 +210,21 @@ const cashTally = {
   image: new Image(),
 }
 cashTally.image.src = "assets/images/cashtally.png";
+
+const onePerSecond = {
+  x: (gameWidth - 96) / 1.55,
+  y: (gameHeight - 96) / 3.5,
+  width: 96,
+  height: 96,
+  image: new Image(),
+}
+onePerSecond.image.src = "assets/images/onepersecplus.png";
+
+const plusTwoOnClick = {
+  x: (gameWidth - 96) / 1.55,
+  y: (gameHeight - 96) / 8,
+  width: 96,
+  height: 96,
+  image: new Image(),
+}
+plusTwoOnClick.image.src = "assets/images/plustwoonclick.png";
