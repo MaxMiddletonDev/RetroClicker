@@ -194,10 +194,10 @@ function updateCashText() {
 
 // IMAGE OBJECTS
 const clicker = {
-  x: (gameWidth - 96) / 4.8,
-  y: (gameHeight - 244) / 2,
-  width: 96,
-  height: 96,
+  x: (gameWidth - 480) / 8,
+  y: (gameHeight - 244) / 3.5,
+  width: 384,
+  height: 384,
   image: new Image(),
 }
 clicker.image.src = "assets/icons/click.png";
