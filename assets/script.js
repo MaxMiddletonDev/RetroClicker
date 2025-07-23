@@ -5,6 +5,7 @@ var gameWidth = canvas.width;
 var gameHeight = canvas.height;
 
 // GAME STATE
+var cashAmount = 0; 
 var currentState = "startMenu";
 
 // RENDERING SETTINGS
@@ -32,6 +33,20 @@ function handleClick(event) {
     currentState = "playing";
     clickSound.play();
     startGame();
+  }
+
+  if (currentState === "playing") {
+    if (isPointInButton(x, y, clicker)) {
+      cashAmount++;
+      clickSound.play();
+      clickSound.volume = 0.5; 
+      console.log("Cash Amount: " + cashAmount);
+      updateCashText(); 
+    }
+    
+    if (isPointInButton(x, y, cashTally)) {
+      alert("Cash Amount: " + cashAmount);
+    }
   }
 }
 
@@ -62,39 +77,72 @@ function resizeCanvas() {
   canvas.style.height = newHeight + 'px';
 }
 
-// BUTTON DRAWING FUNCTION
-function drawButton(button) {
-  ctx.drawImage(button.buttonImage, button.x, button.y, button.width, button.height);
+// DRAWING FUNCTION
+function drawImage(imageObject) {
+  ctx.drawImage(imageObject.image, imageObject.x, imageObject.y, imageObject.width, imageObject.height);
 }
 
 // START MENU 
+function startMenu() {
+  var backgroundImage = new Image();
+  backgroundImage.onload = function() {
+    ctx.drawImage(backgroundImage, 0, 0, gameWidth, gameHeight);
+    drawImage(playButton);
+  };
+  backgroundImage.src = "assets/images/startmenu.png";
+}
+
 const playButton = {
   x: (gameWidth - 560) / 2,
   y: (gameHeight - 120) / 2,
   width: 560,
   height: 120,
-  buttonImage: new Image()
+  image: new Image()
 };
-playButton.buttonImage.src = "assets/images/play.png";
-
-function startMenu() {
-  var backgroundImage = new Image();
-  backgroundImage.onload = function() {
-    ctx.drawImage(backgroundImage, 0, 0, gameWidth, gameHeight);
-    drawButton(playButton);
-  };
-  backgroundImage.src = "assets/images/startmenu.png";
-}
+playButton.image.src = "assets/images/play.png";
 
 // GAME START
 function startGame() {
   var backgroundImage = new Image();
   backgroundImage.onload = function() {
+    ctx.clearRect(0, 0, gameWidth, gameHeight);
     ctx.drawImage(backgroundImage, 0, 0, gameWidth, gameHeight);
+    drawImage(cashTally);
+    drawImage(clicker);
+    updateCashText();
   };
   backgroundImage.src = "assets/images/game.png";
   setTimeout(function() {
     gameAudio.loop = true;
+    gameAudio.volume = 0.75; 
     gameAudio.play();
   }, 200);
 }
+
+function updateCashText() {
+  var textX = cashTally.x + cashTally.width - 325; 
+  var textY = cashTally.y + 65; 
+  ctx.fillStyle = "#1e1c32";
+  ctx.fillRect(textX, textY - 20, 300, 20);
+  ctx.font = "30px arcadeclassicregular";
+  ctx.fillStyle = "#c6baac";
+  ctx.fillText(cashAmount, textX, textY);
+}
+
+const clicker = {
+  x: (gameWidth - 96) / 4.8,
+  y: (gameHeight - 244) / 2,
+  width: 96,
+  height: 96,
+  image: new Image(),
+}
+clicker.image.src = "assets/icons/click.png";
+
+const cashTally = {
+  x: (gameWidth - 460) / 12,
+  y: (gameHeight - 110),
+  width: 460,
+  height: 92,
+  image: new Image(),
+}
+cashTally.image.src = "assets/images/cashtally.png";
