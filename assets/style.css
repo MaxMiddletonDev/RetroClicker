@@ -1,0 +1,32 @@
+@font-face {
+    font-family: 'arcadeclassicregular';
+    src: url('font/arcadeclassic.woff2') format('woff2'),
+         url('font/arcadeclassic.woff') format('woff');
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-drag: none;
+    image-rendering: pixelated;
+}
+
+body {
+    font-family: 'arcadeclassicregular';
+    background-color: #a89e92;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+#game-canvas {
+    max-width: 100%;
+    max-height: 100%;
+    border: none;
+}
