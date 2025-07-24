@@ -4,18 +4,23 @@ var ctx = canvas.getContext("2d");
 var gameWidth = canvas.width;
 var gameHeight = canvas.height;
 
-// GAME STATE
+// GAME VARIABLES
 var cashAmount = 0; 
 var cashPerSecond = 0; 
 var cashPerClick = 1; 
-
 var currentState = "startMenu";
+var currentUIPanel = null;
 
 // RENDERING SETTINGS
 ctx.imageSmoothingEnabled = false;
 ctx.webkitImageSmoothingEnabled = false;
 ctx.mozImageSmoothingEnabled = false;
 ctx.msImageSmoothingEnabled = false;
+
+const UI_PANEL_WIDTH = 460;
+const UI_PANEL_HEIGHT = 508;
+const UI_PANEL_OFFSET_X = 524; 
+const UI_PANEL_OFFSET_Y = 656;
 
 // EVENT LISTENERS
 window.addEventListener("load", startMenu);
@@ -39,7 +44,7 @@ function updateMouseCoordinates(event) {
   return { x: x, y: y };
 }
 
-// CLICK HANDLER
+// BUTTON FUNCTIONS
 function handleClick(event) {
   var { x, y } = updateMouseCoordinates(event);
   
@@ -50,23 +55,53 @@ function handleClick(event) {
   }
 
   if (currentState === "playing") {
+    // CLICKER BUTTON
     if (isPointInButton(x, y, clicker)) {
       cashAmount += cashPerClick; 
       updateCashText(); 
     }
-    if (isPointInButton(x, y, onePerSecond)) {
+    // SHOP BUTTONS
+    // SHOP BUTTON
+    if (isPointInButton(x, y, shopButton)) {
+      currentUIPanel = "shop";
+      ctx.fillStyle = "#c6baac";
+      ctx.fillRect(gameWidth - UI_PANEL_OFFSET_X, gameHeight - UI_PANEL_OFFSET_Y, UI_PANEL_WIDTH, UI_PANEL_HEIGHT);
+      drawImage(onePerSecond);
+      drawImage(plusTwoOnClick);
+    }
+    //ONE PER SECOND BUTTON
+    if (currentUIPanel === "shop" && isPointInButton(x, y, onePerSecond)) {
       if (cashAmount >= 10) {
         cashAmount -= 10;
         cashPerSecond += 1; 
         updateCashText();
       }
     }
-    if (isPointInButton(x, y, plusTwoOnClick)) {
+    // PLUS TWO ON CLICK BUTTON
+    if (currentUIPanel === "shop" && isPointInButton(x, y, plusTwoOnClick)) {
       if (cashAmount >= 25) {
         cashAmount -= 25;
         cashPerClick += 1; 
         updateCashText();
       }
+    }
+    // TROPHY BUTTON
+    if (isPointInButton(x, y, trophyButton)) {
+      currentUIPanel = "trophy";
+      ctx.fillStyle = "#c6baac";
+      ctx.fillRect(gameWidth - UI_PANEL_OFFSET_X, gameHeight - UI_PANEL_OFFSET_Y, UI_PANEL_WIDTH, UI_PANEL_HEIGHT);
+    }
+    // STATS BUTTON
+    if (isPointInButton(x, y, statsButton)) {
+      currentUIPanel = "stats";
+      ctx.fillStyle = "#c6baac";
+      ctx.fillRect(gameWidth - UI_PANEL_OFFSET_X, gameHeight - UI_PANEL_OFFSET_Y, UI_PANEL_WIDTH, UI_PANEL_HEIGHT);
+    }
+    // PRESTIGE BUTTON
+    if (isPointInButton(x, y, prestigeButton)) {
+      currentUIPanel = "prestige";
+      ctx.fillStyle = "#c6baac";
+      ctx.fillRect(gameWidth - UI_PANEL_OFFSET_X, gameHeight - UI_PANEL_OFFSET_Y, UI_PANEL_WIDTH, UI_PANEL_HEIGHT);
     }
   }
 }
@@ -82,13 +117,24 @@ function handleMouseMove(event) {
   if (currentState === "playing" && isPointInButton(x, y, clicker)) {
     isOverClickable = true;
   }
-  if (currentState === "playing" && isPointInButton(x, y, onePerSecond)) {
-    isOverClickable = true;
-  } 
-  if (currentState === "playing" && isPointInButton(x, y, plusTwoOnClick)) {
+  if (currentState === "playing" && isPointInButton(x, y, shopButton)) {
     isOverClickable = true;
   }
-
+  if (currentState === "playing" && currentUIPanel === "shop" && isPointInButton(x, y, onePerSecond)) {
+    isOverClickable = true;
+  } 
+  if (currentState === "playing" && currentUIPanel === "shop" && isPointInButton(x, y, plusTwoOnClick)) {
+    isOverClickable = true;
+  }
+  if (currentState === "playing" && isPointInButton(x, y, trophyButton)) {
+    isOverClickable = true;
+  }
+  if (currentState === "playing" && isPointInButton(x, y, statsButton)) {
+    isOverClickable = true;
+  }
+  if (currentState === "playing" && isPointInButton(x, y, prestigeButton)) {
+    isOverClickable = true;
+  }
   canvas.style.cursor = isOverClickable ? "pointer" : "default";
 }
 
@@ -145,14 +191,17 @@ playButton.image.src = "assets/images/play.png";
 
 // GAME START
 function startGame() {
+  currentUIPanel = null; // Reset panel state
   var backgroundImage = new Image();
   backgroundImage.onload = function() {
     ctx.clearRect(0, 0, gameWidth, gameHeight);
     ctx.drawImage(backgroundImage, 0, 0, gameWidth, gameHeight);
-    drawImage(onePerSecond);
-    drawImage(plusTwoOnClick);
     drawImage(cashTally);
     drawImage(clicker);
+    drawImage(shopButton);
+    drawImage(trophyButton);
+    drawImage(statsButton);
+    drawImage(prestigeButton);
     updateCashText();
   };
   backgroundImage.src = "assets/images/game.png";
@@ -161,7 +210,6 @@ function startGame() {
   }, 200);
 
   cashPerSecondMultiplier();
-  clickMultiplier();
 }
 
 // CASH PER SECOND FUNCTION 
@@ -172,13 +220,6 @@ function cashPerSecondMultiplier() {
       updateCashText();
     }
   }, 1000); 
-}
-// CLICK MULTIPLIER FUNCTION
-function cashPerClickAdder() {
-  if (currentState === "playing") {
-    cashAmount += cashPerClick; 
-    updateCashText(); 
-  }
 }
 
 // UPDATE CASH TEXT FUNCTION
@@ -218,7 +259,7 @@ const onePerSecond = {
   height: 96,
   image: new Image(),
 }
-onePerSecond.image.src = "assets/images/onepersecplus.png";
+onePerSecond.image.src = "assets/icons/onepersecplus.png";
 
 const plusTwoOnClick = {
   x: (gameWidth - 96) / 1.55,
@@ -227,4 +268,40 @@ const plusTwoOnClick = {
   height: 96,
   image: new Image(),
 }
-plusTwoOnClick.image.src = "assets/images/plustwoonclick.png";
+plusTwoOnClick.image.src = "assets/icons/plustwoonclick.png";
+
+const shopButton = {
+  x: (gameWidth - 96) / 2,
+  y: (gameHeight - 96) / 5,
+  width: 96,
+  height: 96,
+  image: new Image(),
+}
+shopButton.image.src = "assets/icons/shop.png";
+
+const trophyButton = {
+  x: (gameWidth - 96) / 2,
+  y: (gameHeight - 96) / 2.8,
+  width: 96,
+  height: 96,
+  image: new Image(),
+}
+trophyButton.image.src = "assets/icons/trophy.png";
+
+const statsButton = {
+  x: (gameWidth - 96) / 2,
+  y: (gameHeight - 96) / 1.95,
+  width: 96,
+  height: 96,
+  image: new Image(),
+}
+statsButton.image.src = "assets/icons/stats.png";
+
+const prestigeButton = {
+  x: (gameWidth - 96) / 2,
+  y: (gameHeight - 96) / 1.5,
+  width: 96,
+  height: 96,
+  image: new Image(),
+}
+prestigeButton.image.src = "assets/icons/prestige.png";
