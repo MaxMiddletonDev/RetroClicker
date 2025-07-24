@@ -23,6 +23,6 @@ const UI_PANEL_OFFSET_Y = 656;
 // SOUNDS AND MUSIC
 var gameAudio = new Audio("assets/music/gamemusic.mp3");
 gameAudio.loop = true;
-gameAudio.volume = 0.25; 
+gameAudio.volume = 0.3; 
 var clickSound = new Audio("assets/music/button.mp3");
 clickSound.volume = 0.5; 
