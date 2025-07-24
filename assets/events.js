@@ -23,7 +23,7 @@ function handleClick(event) {
     // CLICKER BUTTON
     if (isPointInButton(x, y, clicker)) {
       cashAmount += cashPerClick; 
-      updateCashText(); 
+      updateText(); 
     }
     // SHOP BUTTONS
     // SHOP BUTTON
@@ -39,7 +39,7 @@ function handleClick(event) {
       if (cashAmount >= 10) {
         cashAmount -= 10;
         cashPerSecond += 1; 
-        updateCashText();
+        updateText();
       }
     }
     // PLUS TWO ON CLICK BUTTON
@@ -47,7 +47,7 @@ function handleClick(event) {
       if (cashAmount >= 25) {
         cashAmount -= 25;
         cashPerClick += 1; 
-        updateCashText();
+        updateText();
       }
     }
     // TROPHY BUTTON
@@ -56,11 +56,13 @@ function handleClick(event) {
       ctx.fillStyle = "#c6baac";
       ctx.fillRect(gameWidth - UI_PANEL_OFFSET_X, gameHeight - UI_PANEL_OFFSET_Y, UI_PANEL_WIDTH, UI_PANEL_HEIGHT);
     }
+    
     // STATS BUTTON
     if (isPointInButton(x, y, statsButton)) {
       currentUIPanel = "stats";
       ctx.fillStyle = "#c6baac";
       ctx.fillRect(gameWidth - UI_PANEL_OFFSET_X, gameHeight - UI_PANEL_OFFSET_Y, UI_PANEL_WIDTH, UI_PANEL_HEIGHT);
+      drawStatsPanel();
     }
     // PRESTIGE BUTTON
     if (isPointInButton(x, y, prestigeButton)) {
@@ -75,31 +77,26 @@ function handleClick(event) {
 function handleMouseMove(event) {
   var { x, y } = updateMouseCoordinates(event);
   var isOverClickable = false;
+
+  var clickableElements = [
+    { button: playButton, condition: currentState === "startMenu" },
+    { button: clicker, condition: currentState === "playing" },
+    { button: shopButton, condition: currentState === "playing" },
+    { button: onePerSecond, condition: currentState === "playing" && currentUIPanel === "shop" },
+    { button: plusTwoOnClick, condition: currentState === "playing" && currentUIPanel === "shop" },
+    { button: trophyButton, condition: currentState === "playing" },
+    { button: statsButton, condition: currentState === "playing" },
+    { button: prestigeButton, condition: currentState === "playing" }
+  ];
+
+  for (var i = 0; i < clickableElements.length; i++) {
+    var element = clickableElements[i];
+    if (element.condition && isPointInButton(x, y, element.button)) {
+      isOverClickable = true;
+      break;
+    }
+  }
   
-  if (currentState === "startMenu" && isPointInButton(x, y, playButton)) {
-    isOverClickable = true;
-  } 
-  if (currentState === "playing" && isPointInButton(x, y, clicker)) {
-    isOverClickable = true;
-  }
-  if (currentState === "playing" && isPointInButton(x, y, shopButton)) {
-    isOverClickable = true;
-  }
-  if (currentState === "playing" && currentUIPanel === "shop" && isPointInButton(x, y, onePerSecond)) {
-    isOverClickable = true;
-  } 
-  if (currentState === "playing" && currentUIPanel === "shop" && isPointInButton(x, y, plusTwoOnClick)) {
-    isOverClickable = true;
-  }
-  if (currentState === "playing" && isPointInButton(x, y, trophyButton)) {
-    isOverClickable = true;
-  }
-  if (currentState === "playing" && isPointInButton(x, y, statsButton)) {
-    isOverClickable = true;
-  }
-  if (currentState === "playing" && isPointInButton(x, y, prestigeButton)) {
-    isOverClickable = true;
-  }
   canvas.style.cursor = isOverClickable ? "pointer" : "default";
 }
 
@@ -115,7 +112,7 @@ function cashPerSecondMultiplier() {
   setInterval(function() {
     if (currentState === "playing" && cashPerSecond > 0) {
       cashAmount += cashPerSecond;
-      updateCashText();
+      updateText();
     }
   }, 1000); 
 }

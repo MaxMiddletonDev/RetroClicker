@@ -13,9 +13,6 @@ var currentUIPanel = null;
 
 // RENDERING SETTINGS
 ctx.imageSmoothingEnabled = false;
-ctx.webkitImageSmoothingEnabled = false;
-ctx.mozImageSmoothingEnabled = false;
-ctx.msImageSmoothingEnabled = false;
 
 // UI PANEL SETTINGS
 const UI_PANEL_WIDTH = 460;

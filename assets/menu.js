@@ -9,12 +9,3 @@ function startMenu() {
   };
   backgroundImage.src = "assets/images/startmenu.png";
 }
-
-const playButton = {
-  x: (gameWidth - 560) / 2,
-  y: (gameHeight - 120) / 2,
-  width: 560,
-  height: 120,
-  image: new Image()
-};
-playButton.image.src = "assets/images/play.png";
